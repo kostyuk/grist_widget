@@ -84,16 +84,23 @@
               <div class="newlined">{{ business }}</div>
             </template>
             <template v-else>
-              <div>{{ business.Name }}</div>
-              <template v-if="business.Street1">
-                {{ business.Street1 }},
+              <!-- якщо у Reference клієнта є одне поле Address — показуємо його як є -->
+              <template v-if="business.Address">
+                <div class="newlined">{{ business.Address }}</div>
               </template>
-              <template v-if="business.Street2">
-                {{ business.Street2 }},
-              </template>
-              {{ business.City }} {{ business.State }} {{ business.Zip }}
-              <template v-if="business.Country">
-                <br />{{ business.Country }}
+              <template v-else>
+                <!-- запасний варіант для старої структури з окремими полями -->
+                <div>{{ business.Name }}</div>
+                <template v-if="business.Street1">
+                  {{ business.Street1 }},
+                </template>
+                <template v-if="business.Street2">
+                  {{ business.Street2 }},
+                </template>
+                {{ business.City }} {{ business.State }} {{ business.Zip }}
+                <template v-if="business.Country">
+                  <br />{{ business.Country }}
+                </template>
               </template>
             </template>
           </div>
