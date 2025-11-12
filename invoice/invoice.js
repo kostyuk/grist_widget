@@ -32,30 +32,16 @@ function addDemo(row) {
       Website: 'Invoicer.Website'
     }
   }
-
-  // --- CHANGED: prefer single-text Address for Client if present ---
   if (!row.Client) {
-    if (typeof row.Address === 'string' && row.Address.trim()) {
-      // Use a single text column as the client address
-      row.Client = row.Address;
-    } else {
-      // Fallback to the original structured object shape
-      row.Client = {
-        Name: 'Client.Name',
-        Street1: 'Client.Street1',
-        Street2: 'Client.Street2',
-        City: 'Client.City',
-        State: '.State',
-        Zip: '.Zip'
-      }
+    row.Client = {
+      Name: 'Client.Name',
+      Street1: 'Client.Street1',
+      Street2: 'Client.Street2',
+      City: 'Client.City',
+      State: '.State',
+      Zip: '.Zip'
     }
   }
-  // If Client exists but Address is also provided as text, prefer the text form.
-  if (row.Client && typeof row.Address === 'string' && row.Address.trim()) {
-    row.Client = row.Address;
-  }
-  // --- /CHANGED ---
-
   if (!row.Items) {
     row.Items = [
       {
@@ -88,10 +74,10 @@ let app = undefined;
 Vue.filter('currency', formatNumberAsUSD)
 function formatNumberAsUSD(value) {
   if (typeof value !== "number") {
-    return value || '—';
+    return value || '—';      // falsy value would be shown as a dash.
   }
-  value = Math.round(value * 100) / 100;
-  value = (value === -0 ? 0 : value);
+  value = Math.round(value * 100) / 100;    // Round to nearest cent.
+  value = (value === -0 ? 0 : value);       // Avoid negative zero.
 
   const result = value.toLocaleString('en', {
     style: 'currency', currency: 'USD'
@@ -103,7 +89,9 @@ function formatNumberAsUSD(value) {
 }
 
 Vue.filter('fallback', function(value, str) {
-  if (!value) { throw new Error("Please provide column " + str); }
+  if (!value) {
+    throw new Error("Please provide column " + str);
+  }
   return value;
 });
 
@@ -166,7 +154,7 @@ function updateInvoice(row) {
     // Add some guidance about columns.
     const want = new Set(Object.keys(addDemo({})));
     const accepted = new Set(['References']);
-    const importance = ['Number', 'Client', 'Items', 'Total', 'Invoicer', 'Due',
+    const importance = ['Number', 'Client', 'Items', 'Total', 'Invoicer', 'Due', 
                         'Issued', 'Subtotal', 'Deduction', 'Taxes', 'Note', 'Paid'];
     if (!('Due' in row || 'Issued' in row)) {
       const seen = new Set(Object.keys(row).filter(k => k !== 'id' && k !== '_error_'));
@@ -188,12 +176,6 @@ function updateInvoice(row) {
         row.SuggestReferencesColumn = true;
       }
     }
-
-    // Ensure our Client preference is applied even after merging References.
-    if (typeof row.Address === 'string' && row.Address.trim()) {
-      row.Client = row.Address;
-    }
-
     addDemo(row);
     if (!row.Subtotal && !row.Total && row.Items && Array.isArray(row.Items)) {
       try {
@@ -230,6 +212,9 @@ ready(function() {
 
   // Monitor status so we can give user advice.
   grist.on('message', msg => {
+    // If we are told about a table but not which row to access, check the
+    // number of rows.  Currently if the table is empty, and "select by" is
+    // not set, onRecord() will never be called.
     if (msg.tableId && !app.rowConnected) {
       grist.docApi.fetchSelectedTable().then(table => {
         if (table.id && table.id.length >= 1) {
