@@ -86,6 +86,7 @@
             <template v-else>
               <!-- якщо у Reference клієнта є одне поле Address — показуємо його як є -->
               <template v-if="business.Address">
+                <div v-if="business.Name">{{ business.Name }}</div>
                 <div class="newlined">{{ business.Address }}</div>
               </template>
               <template v-else>
