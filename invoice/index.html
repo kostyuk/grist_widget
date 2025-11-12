@@ -85,14 +85,34 @@
             </template>
             <template v-else>
               <!-- 1) Ім'я/назва клієнта (опційно) -->
-              <div v-if="business.Name || business.FullName || business.Company || business.Title">
-                {{ business.Name || business.FullName || business.Company || business.Title }}
-              </div>
+              <template v-if="business.Name">
+                <div>{{ business.Name }}</div>
+              </template>
+              <template v-else-if="business.FullName">
+                <div>{{ business.FullName }}</div>
+              </template>
+              <template v-else-if="business.Company">
+                <div>{{ business.Company }}</div>
+              </template>
+              <template v-else-if="business.Title">
+                <div>{{ business.Title }}</div>
+              </template>
 
               <!-- 2) Повна адреса, якщо є одне з типових полів -->
               <template v-if="business.Address || business.FullAddress || business.Location || business.Addr">
                 <div class="newlined">
-                  {{ business.Address || business.FullAddress || business.Location || business.Addr }}
+                  <template v-if="business.Address">
+                    {{ business.Address }}
+                  </template>
+                  <template v-else-if="business.FullAddress">
+                    {{ business.FullAddress }}
+                  </template>
+                  <template v-else-if="business.Location">
+                    {{ business.Location }}
+                  </template>
+                  <template v-else>
+                    {{ business.Addr }}
+                  </template>
                 </div>
               </template>
 
