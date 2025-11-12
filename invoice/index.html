@@ -84,24 +84,29 @@
               <div class="newlined">{{ business }}</div>
             </template>
             <template v-else>
-              <!-- якщо у Reference клієнта є одне поле Address — показуємо його як є -->
-              <template v-if="business.Address">
-                <div v-if="business.Name">{{ business.Name }}</div>
-                <div class="newlined">{{ business.Address }}</div>
+              <!-- 1) Ім'я/назва клієнта (опційно) -->
+              <div v-if="business.Name || business.FullName || business.Company || business.Title">
+                {{ business.Name || business.FullName || business.Company || business.Title }}
+              </div>
+
+              <!-- 2) Повна адреса, якщо є одне з типових полів -->
+              <template v-if="business.Address || business.FullAddress || business.Location || business.Addr">
+                <div class="newlined">
+                  {{ business.Address || business.FullAddress || business.Location || business.Addr }}
+                </div>
               </template>
+
+              <!-- 3) Фолбек на стару структуровану схему -->
               <template v-else>
-                <!-- запасний варіант для старої структури з окремими полями -->
-                <div>{{ business.Name }}</div>
-                <template v-if="business.Street1">
-                  {{ business.Street1 }},
-                </template>
-                <template v-if="business.Street2">
-                  {{ business.Street2 }},
-                </template>
-                {{ business.City }} {{ business.State }} {{ business.Zip }}
-                <template v-if="business.Country">
-                  <br />{{ business.Country }}
-                </template>
+                <div class="newlined">
+                  <template v-if="business.Street1">
+                    {{ business.Street1 }}<template v-if="business.Street2">, {{ business.Street2 }}</template>,
+                  </template>
+                  {{ business.City }}
+                  <template v-if="business.State"> {{ business.State }}</template>
+                  <template v-if="business.Zip"> {{ business.Zip }}</template>
+                  <template v-if="business.Country"><br />{{ business.Country }}</template>
+                </div>
               </template>
             </template>
           </div>
